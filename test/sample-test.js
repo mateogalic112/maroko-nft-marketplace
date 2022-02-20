@@ -1,46 +1,32 @@
+const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("NFTMarket", function () {
-  it("Should create and execute sales", async function () {
-    const Market = await ethers.getContractFactory("NFTMarket")
-    const market = await Market.deploy()
-    await market.deployed()
-    const marketAddress = market.address
-
+describe("NFT minting", function () {
+  it("Should mint and transfer an NFT to someone", async function () {
     const NFT = await ethers.getContractFactory("NFT");
-    const nft = await NFT.deploy(marketAddress)
+    const nft = await NFT.deploy()
     await nft.deployed()
-    const nftContractAddress = nft.address
 
-    const auctionPrice = ethers.utils.parseUnits('100', 'ether')
+    const nftPrice = ethers.utils.parseUnits('20', 'ether')
 
-    await nft.createToken("https://www.mytokenlocation.com")
-    await nft.createToken("https://www.mytokenlocation2.com")
+    const recipient = '0x8626f6940e2eb28930efb4cef49b2d1f2c9c1199';
+    const metadataURI = 'cid/test.png';
 
-    await market.createMarketItem(nftContractAddress, 1, auctionPrice)
-    await market.createMarketItem(nftContractAddress, 2, auctionPrice)
+    let balance = await nft.balanceOf(recipient);
+    expect(balance).to.equal(0);
 
-    const [_, buyerAddress] = await ethers.getSigners()
+    const mintedToken = await nft.payToMint(recipient, metadataURI, nftPrice, {value: ethers.utils.parseEther('100')})
+    await mintedToken.wait()
 
-    await market.connect(buyerAddress).createMarketSale(nftContractAddress, 1, { value: auctionPrice })
+    balance = await nft.balanceOf(recipient);
+    expect(balance).to.equal(1);
 
-    let items = await market.fetchMarketItems()
+    expect(await nft.isContentOwned(metadataURI)).to.equal(true)
 
-    items = await Promise.all(items.map(async i => {
-      const tokenUri = await nft.tokenURI(i.tokenId)
-      console.log("Token URI", tokenUri);
+    const contractBalance = await nft.getBalance()
+    console.log(ethers.utils.formatEther(contractBalance));
 
-      let item = {
-        price: i.price.toString(),
-        tokenId: i.tokenId.toString(),
-        seller: i.seller,
-        owner: i.owner,
-        tokenUri
-      }
-
-      return item
-    }))
-
-    console.log("market items: ", items)
+    await nft.transferFunds()
+    
   });
 });
