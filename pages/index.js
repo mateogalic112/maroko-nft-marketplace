@@ -4,7 +4,7 @@ import Landing from "../components/Landing";
 
 export default function Home() {
   return (
-    <Container>
+    <Container maxW='container.lg'>
       <Stack spacing={3}>
         <Text fontSize="2xl">In love with React & Next</Text>
       </Stack>
