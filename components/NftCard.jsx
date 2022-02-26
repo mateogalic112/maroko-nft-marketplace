@@ -7,9 +7,7 @@ import {
   HStack,
   Flex,
   Image,
-  Center,
   Heading,
-  VStack,
   Spacer,
 } from "@chakra-ui/react";
 import {
@@ -83,6 +81,11 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
       borderRadius="2xl"
       p={6}
       flexDirection="column"
+      boxShadow='0 0 2px #7FB083'
+      transition='box-shadow 0.2s'
+      _hover={{
+        boxShadow: '0 0 5px #7FB083'
+      }}
     >
       <Box position="relative" mb={4}>
         <Image
