@@ -1,0 +1,68 @@
+import { createContext, useReducer, useContext, useMemo, useCallback } from "react";
+import walletReducer from "./reducer";
+
+const WalletContext = createContext();
+
+const initalState = {
+  account: null,
+};
+
+function WalletProvider({ children }) {
+  const [{account}, dispatch] = useReducer(walletReducer, initalState);
+
+  const connectAccount = async () => {
+    if (!window.ethereum) {
+      alert("Get MetaMask!");
+      return;
+    }
+
+    const accounts = await window.ethereum.request({
+      method: "eth_requestAccounts",
+    });
+
+    dispatch({
+      type: "ADD_ACCOUNT",
+      payload: accounts[0],
+    });
+  };
+
+  const isWalletConnected = useCallback(async () => {
+    if (!window.ethereum) {
+      return;
+    }
+
+    const accounts = await window.ethereum.request({
+      method: "eth_accounts",
+    });
+
+    if (!accounts.length) {
+      return;
+    }
+
+    await connectAccount()
+  }, []);
+
+  const handleAccountChange = (accounts) => {
+      const payload = accounts.length > 0 ? accounts[0] : null
+
+      dispatch({
+          type: "ACCOUNT_CHANGE",
+          payload
+      })
+  }
+
+  const value = useMemo(() => ({ account, dispatch, connectAccount, isWalletConnected, handleAccountChange }), [account, isWalletConnected]);
+  return (
+    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
+  );
+}
+
+function useWalletContext() {
+  const context = useContext(WalletContext);
+  if (context === undefined) {
+    throw new Error("useWallet must be used within a WalletProvider");
+  }
+  return context;
+}
+
+export { WalletProvider, useWalletContext }
