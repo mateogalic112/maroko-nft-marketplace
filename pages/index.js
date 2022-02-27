@@ -3,8 +3,22 @@ import { Container, Box } from "@chakra-ui/react";
 import Landing from "../components/Landing";
 import Hero from "../components/Hero";
 import Navbar from "../components/Navbar";
+import { useEffect } from "react";
+import { useWalletContext } from "../context/wallet";
 
 export default function Home() {
+  const { isWalletConnected, handleAccountChange } = useWalletContext()
+
+  useEffect(() => {
+    isWalletConnected()
+  }, [isWalletConnected])
+
+  useEffect(() => {
+    ethereum.on('accountsChanged', (accounts) => {
+      handleAccountChange(accounts)
+    });
+  }, [handleAccountChange])
+
   return (
     <Box
       minH="100vh"

@@ -19,6 +19,9 @@ import { useState, useCallback } from "react";
 import axios from "axios";
 
 function NftCard({ tokenId, getCount, contract, signer, count }) {
+  console.log("NFT rendered");
+
+
   const metadataUri = `${IPFS_GATEWAY}/${IPFS_JSON_CID}/${tokenId}.json`;
   const imageUri = `${IPFS_GATEWAY}/${IPFS_IMAGE_CID}/${tokenId}.png`;
 
@@ -27,9 +30,7 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
 
   const getMintedStatus = useCallback(async () => {
     const result = await contract.isContentOwned(metadataUri);
-    console.log(result);
     setisMinted(result);
-    console.log(parseInt(await contract.count()));
   }, [contract, metadataUri]);
 
   useEffect(() => {
@@ -51,9 +52,6 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
     const connection = contract.connect(signer);
     const addr = connection.address;
     const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
-    console.log("formatted price", formattedPrice);
-    console.log("addr", addr);
-    console.log("metadata", metadataUri);
     const result = await contract.payToMint(addr, metadataUri, formattedPrice, {
       value: formattedPrice,
     });

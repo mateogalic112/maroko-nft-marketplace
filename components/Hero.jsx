@@ -10,9 +10,11 @@ import {
 } from "@chakra-ui/react";
 
 export default function Hero() {
+  console.log("Hero rendered");
+
   return (
     <Container maxW="container.xl" px={0}>
-      <Flex wrap>
+      <Flex wrap gap={8}>
         <Stack
           spacing={{ base: 8, md: 10 }}
           py={{ base: 20, md: 28 }}
@@ -54,7 +56,7 @@ export default function Hero() {
           </Stack>
         </Stack>
         <Center flex="1">
-          <Image src="/matic.png" alt="MATIC" />
+          <Image src="/matic.png" alt="MATIC" opacity={0.5} />
         </Center>
       </Flex>
     </Container>
