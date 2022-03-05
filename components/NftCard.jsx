@@ -1,5 +1,3 @@
-import { ethers } from "ethers";
-import { useEffect } from "react";
 import {
   Box,
   Text,
@@ -11,59 +9,21 @@ import {
   Spacer,
 } from "@chakra-ui/react";
 import {
-  IPFS_IMAGE_CID,
   IPFS_JSON_CID,
   IPFS_GATEWAY,
 } from "../utils/constants";
-import { useState, useCallback } from "react";
-import axios from "axios";
+import useMintedStatus from "../hooks/useMintedStatus";
+import useMetadata from "../hooks/useMetadata";
+import { useWalletContext } from "../context/wallet";
 
 function NftCard({ tokenId, getCount, contract, signer, count }) {
   console.log("NFT rendered");
 
-
   const metadataUri = `${IPFS_GATEWAY}/${IPFS_JSON_CID}/${tokenId}.json`;
-  const imageUri = `${IPFS_GATEWAY}/${IPFS_IMAGE_CID}/${tokenId}.png`;
 
-  const [isMinted, setisMinted] = useState(false);
-  const [metadata, setMetadata] = useState(null);
-
-  const getMintedStatus = useCallback(async () => {
-    const result = await contract.isContentOwned(metadataUri);
-    setisMinted(result);
-  }, [contract, metadataUri]);
-
-  useEffect(() => {
-    if (contract) {
-      getMintedStatus();
-    }
-  }, [contract, count, getMintedStatus]);
-
-  useEffect(() => {
-    const getMetadata = async () => {
-      const response = await axios.get(metadataUri).then((res) => res.data);
-      setMetadata(response);
-    };
-
-    getMetadata();
-  }, [metadataUri]);
-
-  const mintToken = async () => {
-    const connection = contract.connect(signer);
-    const addr = connection.address;
-    const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
-    const result = await contract.payToMint(addr, metadataUri, formattedPrice, {
-      value: formattedPrice,
-    });
-
-    await result.wait();
-    getMintedStatus();
-    getCount();
-  };
-
-  async function getUri() {
-    console.log(await contract.tokenURI(tokenId));
-  }
+  const { metadata } = useMetadata(metadataUri)
+  const { mintStatus: isMinted } = useMintedStatus(contract, metadataUri, count)
+  const { mintToken } = useWalletContext()
 
   const textColor = "#8BACD9";
 
@@ -87,7 +47,7 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
     >
       <Box position="relative" mb={4}>
         <Image
-          src={imageUri}
+          src={metadata.image}
           cursor="pointer"
           alt="NFT image"
           h={160}
@@ -144,7 +104,7 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
           background="#8247E5"
           w="100%"
           variant="solid"
-          onClick={mintToken}
+          onClick={() => mintToken(contract, signer, metadataUri)}
           color="white"
           transition="background 0.2s"
         >
