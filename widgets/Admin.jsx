@@ -2,7 +2,6 @@ import { Text, Button, Flex, VStack } from "@chakra-ui/react";
 import useContract from "../hooks/useContract";
 
 export const Admin = () => {
-  console.log("Admin rendered");
   const { contractBalance, getContractBalance, collectMoney } = useContract()
 
   return (

@@ -17,8 +17,6 @@ import useMetadata from "../hooks/useMetadata";
 import { useWalletContext } from "../context/wallet";
 
 function NftCard({ tokenId, getCount, contract, signer, count }) {
-  console.log("NFT rendered");
-
   const metadataUri = `${IPFS_GATEWAY}/${IPFS_JSON_CID}/${tokenId}.json`;
 
   const { metadata } = useMetadata(metadataUri)

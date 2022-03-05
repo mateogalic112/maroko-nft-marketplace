@@ -14,14 +14,6 @@ const useCount = () => {
   }, []);
 
   const getCount = async () => {
-    if (!window?.ethereum) {
-      window.alert("No wallet found!");
-      return;
-    } else if (!ethereum.isConnected()) {
-      window.alert("Connect wallet!");
-      return;
-    }
-
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     setSigner(signer);

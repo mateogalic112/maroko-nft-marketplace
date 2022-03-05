@@ -10,8 +10,6 @@ import {
 } from "@chakra-ui/react";
 
 export default function Hero() {
-  console.log("Hero rendered");
-
   return (
     <Container maxW="container.xl" px={0}>
       <Flex wrap gap={8}>
