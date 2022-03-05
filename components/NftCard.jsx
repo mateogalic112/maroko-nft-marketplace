@@ -22,8 +22,8 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
   const metadataUri = `${IPFS_GATEWAY}/${IPFS_JSON_CID}/${tokenId}.json`;
 
   const { metadata } = useMetadata(metadataUri)
-  const { mintStatus: isMinted } = useMintedStatus(contract, metadataUri, count)
-  const { mintToken } = useWalletContext()
+  const { mintToken, account } = useWalletContext()
+  const { isMinted } = useMintedStatus(contract, metadataUri, count, account)
 
   const textColor = "#8BACD9";
 
@@ -95,7 +95,7 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
         >
           MINTED!
         </Button>
-      ) : (
+      ) : account ? (
         <Button
           _hover={{
             background: "#15263F",
@@ -104,13 +104,13 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
           background="#8247E5"
           w="100%"
           variant="solid"
-          onClick={() => mintToken(contract, signer, metadataUri)}
+          onClick={() => mintToken(contract, signer, metadataUri, metadata, getCount)}
           color="white"
           transition="background 0.2s"
         >
           MINT
         </Button>
-      )}
+      ) : null}
     </Box>
   );
 }
