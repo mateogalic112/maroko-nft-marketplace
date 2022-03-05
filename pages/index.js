@@ -12,6 +12,7 @@ export default function Home() {
         backgroundImage: "url('/bg.jpg')",
         backgroundSize: "cover",
         backgroundAttachment: "fixed",
+        paddingBottom: '5rem'
       }}
     >
       <Navbar />

@@ -29,15 +29,14 @@ function WalletProvider({ children }) {
     });
   };
 
-  const handleAccountChange = useCallback(() => {
-    window.ethereum.on("accountsChanged", (accounts) => {
+  const handleAccountChange = useCallback((accounts) => {
       const payload = accounts.length > 0 ? accounts[0] : null;
+      console.log(payload);
 
       dispatch({
         type: "ACCOUNT_CHANGE",
         payload,
       });
-    });
   }, []);
 
   const mintToken = async (contract, signer, metadataUri, metadata, getCount) => {
