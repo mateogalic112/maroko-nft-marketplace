@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 
-const useMintedStatus = (contract, metadataUri, count) => {
+const useMintedStatus = (contract, metadataUri, count, account) => {
     const [isMinted, setisMinted] = useState(false);
 
   const getMintedStatus = useCallback(async () => {
@@ -17,7 +17,7 @@ const useMintedStatus = (contract, metadataUri, count) => {
     if (contract && metadataUri) {
       getMintedStatus();
     }
-  }, [contract, count, getMintedStatus, metadataUri]);
+  }, [contract, count, getMintedStatus, metadataUri, account]);
 
   return { isMinted }
 }

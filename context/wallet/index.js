@@ -4,6 +4,7 @@ import {
   useContext,
   useMemo,
   useCallback,
+  useEffect
 } from "react";
 import walletReducer from "./reducer";
 import { ethers } from "ethers";
@@ -18,11 +19,6 @@ function WalletProvider({ children }) {
   const [{ account }, dispatch] = useReducer(walletReducer, initalState);
 
   const connectAccount = async () => {
-    if (!window.ethereum) {
-      alert("Get MetaMask!");
-      return;
-    }
-
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
@@ -33,29 +29,8 @@ function WalletProvider({ children }) {
     });
   };
 
-  const isWalletConnected = useCallback(async () => {
-    if (!window.ethereum) {
-      return;
-    }
-
-    const accounts = await window.ethereum.request({
-      method: "eth_accounts",
-    });
-
-    if (!accounts.length) {
-      return;
-    }
-
-    await connectAccount();
-  }, []);
-
-  const handleAccountChange = () => {
-    if (!window.ethereum) {
-      alert("Get MetaMask!");
-      return;
-    }
-
-    window?.ethereum?.on("accountsChanged", (accounts) => {
+  const handleAccountChange = useCallback(() => {
+    window.ethereum.on("accountsChanged", (accounts) => {
       const payload = accounts.length > 0 ? accounts[0] : null;
 
       dispatch({
@@ -63,9 +38,9 @@ function WalletProvider({ children }) {
         payload,
       });
     });
-  };
+  }, []);
 
-  const mintToken = async (contract, signer, metadataUri) => {
+  const mintToken = async (contract, signer, metadataUri, metadata, getCount) => {
       if (!contract || !signer || !metadataUri) return;
       const connection = contract.connect(signer);
       const addr = connection.address;
@@ -75,20 +50,28 @@ function WalletProvider({ children }) {
       });
   
       await result.wait();
-      // getMintedStatus();
-      // getCount();
+      getCount();
   }
+
+  useEffect(() => {
+    window.ethereum.on("chainChanged", () => {
+      window.location.reload();
+    });
+
+    ethereum.on("accountsChanged", (accounts) => {
+      handleAccountChange(accounts);
+    });
+  }, [handleAccountChange]);
 
   const value = useMemo(
     () => ({
       account,
       dispatch,
       connectAccount,
-      isWalletConnected,
       handleAccountChange,
       mintToken
     }),
-    [account, isWalletConnected]
+    [account, handleAccountChange]
   );
   return (
     <WalletContext.Provider value={value}>{children}</WalletContext.Provider>

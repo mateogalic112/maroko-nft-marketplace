@@ -3,11 +3,8 @@ import Landing from "../components/Landing";
 import Hero from "../components/Hero";
 import Navbar from "../components/Navbar";
 import Admin from "../widgets/Admin";
-import useMetamaskListener from "../hooks/useMetamaskListener";
 
 export default function Home() {
-  useMetamaskListener();
-
   return (
     <Box
       minH="100vh"
