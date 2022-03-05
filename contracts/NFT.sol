@@ -7,11 +7,13 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract NFT is ERC721, ERC721URIStorage {
     using Counters for Counters.Counter;
-
     Counters.Counter private _tokenIdCounter;
 
     // keep count of minted tokens 
     mapping(string => bool) existingURIs;
+
+    // keep track who owns which token
+    mapping(uint256 => address) private mintedIdToAddress;
 
     address payable owner;
 
@@ -56,6 +58,12 @@ contract NFT is ERC721, ERC721URIStorage {
         return existingURIs[uri] == true;
     }
 
+    // Get total number of minted NFTs
+    function count() public view returns (uint256) {
+        return _tokenIdCounter.current();
+    }
+
+    // Mint NFT
     function payToMint(
         address recipient,
         string memory metadataURI,
@@ -68,11 +76,35 @@ contract NFT is ERC721, ERC721URIStorage {
         uint256 newItemId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         existingURIs[metadataURI] = true;
+        mintedIdToAddress[newItemId] = recipient;
 
         _mint(recipient, newItemId);
         _setTokenURI(newItemId, metadataURI);
 
         return newItemId;
+    }
+
+    // Get NFTs I own
+    function fetchMyNfts() public view returns (uint256[] memory) {
+        uint totalMintedCount = _tokenIdCounter.current();
+        uint itemCount = 0;
+        uint currentIndex = 0;
+
+        for (uint i = 0; i < totalMintedCount; i++) {
+            if (mintedIdToAddress[i] == msg.sender) {
+                itemCount += 1;
+            }
+        } 
+
+        uint256[] memory items = new uint256[](itemCount);
+        for (uint i = 0; i < totalMintedCount; i++) {
+            if (mintedIdToAddress[i] == msg.sender) {
+                items[currentIndex] = i;
+                currentIndex += 1;
+            }
+        } 
+
+        return items;
     }
 
     function getBalance() public onlyOwner view returns (uint) {
@@ -81,9 +113,5 @@ contract NFT is ERC721, ERC721URIStorage {
 
     function transferFunds() public onlyOwner {
         owner.transfer(getBalance());
-    }
-
-    function count() public view returns (uint256) {
-        return _tokenIdCounter.current();
     }
 }
