@@ -13,7 +13,7 @@ contract NFT is ERC721, ERC721URIStorage {
     mapping(string => bool) existingURIs;
 
     // keep track who owns which token
-    mapping(uint256 => address) private mintedIdToAddress;
+    mapping(address => uint256[]) myNfts;
 
     address payable owner;
 
@@ -36,6 +36,7 @@ contract NFT is ERC721, ERC721URIStorage {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         existingURIs[uri] = true;
+        myNfts[to].push(tokenId);
     }
 
     // The following functions are overrides required by Solidity.
@@ -53,6 +54,11 @@ contract NFT is ERC721, ERC721URIStorage {
         return super.tokenURI(tokenId);
     }
 
+     // Get NFTs I own
+    function fetchMyNfts() external view returns (uint256[] memory) {
+        return myNfts[msg.sender];
+    }
+
     // Check if NFT is already minted
     function isContentOwned(string memory uri) public view returns (bool) {
         return existingURIs[uri] == true;
@@ -65,7 +71,6 @@ contract NFT is ERC721, ERC721URIStorage {
 
     // Mint NFT
     function payToMint(
-        address recipient,
         string memory metadataURI,
         uint price
     ) public payable returns (uint256) {
@@ -76,35 +81,12 @@ contract NFT is ERC721, ERC721URIStorage {
         uint256 newItemId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         existingURIs[metadataURI] = true;
-        mintedIdToAddress[newItemId] = recipient;
+        myNfts[msg.sender].push(newItemId);
 
-        _mint(recipient, newItemId);
+        _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, metadataURI);
 
         return newItemId;
-    }
-
-    // Get NFTs I own
-    function fetchMyNfts() public view returns (uint256[] memory) {
-        uint totalMintedCount = _tokenIdCounter.current();
-        uint itemCount = 0;
-        uint currentIndex = 0;
-
-        for (uint i = 0; i < totalMintedCount; i++) {
-            if (mintedIdToAddress[i] == msg.sender) {
-                itemCount += 1;
-            }
-        } 
-
-        uint256[] memory items = new uint256[](itemCount);
-        for (uint i = 0; i < totalMintedCount; i++) {
-            if (mintedIdToAddress[i] == msg.sender) {
-                items[currentIndex] = i;
-                currentIndex += 1;
-            }
-        } 
-
-        return items;
     }
 
     function getBalance() public onlyOwner view returns (uint) {

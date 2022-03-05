@@ -41,10 +41,8 @@ function WalletProvider({ children }) {
 
   const mintToken = async (contract, signer, metadataUri, metadata, getCount) => {
       if (!contract || !signer || !metadataUri) return;
-      const connection = contract.connect(signer);
-      const addr = connection.address;
       const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
-      const result = await contract.payToMint(addr, metadataUri, formattedPrice, {
+      const result = await contract.payToMint(metadataUri, formattedPrice, {
         value: formattedPrice,
       });
   
