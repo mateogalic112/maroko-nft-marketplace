@@ -1,5 +1,12 @@
-import { createContext, useReducer, useContext, useMemo, useCallback } from "react";
+import {
+  createContext,
+  useReducer,
+  useContext,
+  useMemo,
+  useCallback,
+} from "react";
 import walletReducer from "./reducer";
+import { ethers } from "ethers";
 
 const WalletContext = createContext();
 
@@ -8,7 +15,7 @@ const initalState = {
 };
 
 function WalletProvider({ children }) {
-  const [{account}, dispatch] = useReducer(walletReducer, initalState);
+  const [{ account }, dispatch] = useReducer(walletReducer, initalState);
 
   const connectAccount = async () => {
     if (!window.ethereum) {
@@ -39,19 +46,50 @@ function WalletProvider({ children }) {
       return;
     }
 
-    await connectAccount()
+    await connectAccount();
   }, []);
 
-  const handleAccountChange = (accounts) => {
-      const payload = accounts.length > 0 ? accounts[0] : null
+  const handleAccountChange = () => {
+    if (!window.ethereum) {
+      alert("Get MetaMask!");
+      return;
+    }
+
+    window?.ethereum?.on("accountsChanged", (accounts) => {
+      const payload = accounts.length > 0 ? accounts[0] : null;
 
       dispatch({
-          type: "ACCOUNT_CHANGE",
-          payload
-      })
+        type: "ACCOUNT_CHANGE",
+        payload,
+      });
+    });
+  };
+
+  const mintToken = async (contract, signer, metadataUri) => {
+      if (!contract || !signer || !metadataUri) return;
+      const connection = contract.connect(signer);
+      const addr = connection.address;
+      const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
+      const result = await contract.payToMint(addr, metadataUri, formattedPrice, {
+        value: formattedPrice,
+      });
+  
+      await result.wait();
+      // getMintedStatus();
+      // getCount();
   }
 
-  const value = useMemo(() => ({ account, dispatch, connectAccount, isWalletConnected, handleAccountChange }), [account, isWalletConnected]);
+  const value = useMemo(
+    () => ({
+      account,
+      dispatch,
+      connectAccount,
+      isWalletConnected,
+      handleAccountChange,
+      mintToken
+    }),
+    [account, isWalletConnected]
+  );
   return (
     <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
   );
@@ -65,4 +103,4 @@ function useWalletContext() {
   return context;
 }
 
-export { WalletProvider, useWalletContext }
+export { WalletProvider, useWalletContext };
