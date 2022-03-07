@@ -9,9 +9,9 @@ const useContractBalance = () => {
   const { totalMinted } = useTotalMinted()
 
   const getContractBalance = useCallback(async () => {
-    if (!contract) return
-
-    setContractBalance(await contract.getBalance());
+    try {
+      setContractBalance(await contract.getBalance());
+    } catch (e) {}
   }, [contract]);
 
   useEffect(() => {
