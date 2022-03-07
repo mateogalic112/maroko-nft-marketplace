@@ -8,6 +8,8 @@ import {
 } from "react";
 import walletReducer from "./reducer";
 import { ethers } from "ethers";
+import NFT from "../../artifacts/contracts/NFT.sol/NFT.json";
+import { CONTRACT_ADDRESS } from "../../utils/constants";
 
 const WalletContext = createContext();
 
@@ -16,42 +18,59 @@ const initalState = {
 };
 
 function WalletProvider({ children }) {
-  const [{ account }, dispatch] = useReducer(walletReducer, initalState);
-
-  const connectAccount = async () => {
+  const [{ account, signer, contract }, dispatch] = useReducer(walletReducer, initalState);
+  
+  const connectAccount = useCallback(async () => {
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
+    
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, NFT.abi, signer);
 
     dispatch({
       type: "ADD_ACCOUNT",
-      payload: accounts[0],
+      payload: {
+        account: accounts[0],
+        signer,
+        contract
+      },
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    if (window?.ethereum) {
+      connectAccount()
+    }
+  }, [connectAccount])
 
   const handleAccountChange = useCallback((accounts) => {
-      const payload = accounts.length > 0 ? accounts[0] : null;
+      const account = accounts.length > 0 ? accounts[0] : null;
+
+      let signer = null
+      if (account) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+      }
 
       dispatch({
         type: "ACCOUNT_CHANGE",
-        payload,
+        payload: {
+          account,
+          signer
+        },
       });
   }, []);
 
-  const getAccountBalance = useCallback(async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    return await provider.getBalance(account)
-  }, [account]) 
-
-  const mintToken = async (contract, signer, metadataUri, metadata, getCount) => {
-      if (!contract || !signer || !metadataUri) return;
+  const mintToken = async (contract, metadataUri, metadata) => {
+      if (!contract || !metadataUri) return;
       const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
       const result = await contract.payToMint(metadataUri, formattedPrice, {
         value: formattedPrice,
       });
   
       await result.wait();
-      getCount();
   }
 
   useEffect(() => {
@@ -67,13 +86,14 @@ function WalletProvider({ children }) {
   const value = useMemo(
     () => ({
       account,
+      signer,
+      contract,
       dispatch,
       connectAccount,
       handleAccountChange,
-      mintToken,
-      getAccountBalance
+      mintToken
     }),
-    [account, handleAccountChange, getAccountBalance]
+    [account, signer, contract, handleAccountChange, connectAccount]
   );
   return (
     <WalletContext.Provider value={value}>{children}</WalletContext.Provider>

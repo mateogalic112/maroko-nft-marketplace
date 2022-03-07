@@ -1,28 +1,27 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { useWalletContext } from "../context/wallet";
 
-import useContract from "./useContract";
+import useTotalMinted from "./useTotalMinted";
 
-const useFetchMyNfts = (count) => {
-  const { contract } = useContract()
-
+const useFetchMyNfts = () => {
   const [myNfts, setMyNfts] = useState([])
 
-  const { account } = useWalletContext()
-
-  const getMyNfts = useCallback(async () => {
-    try {
-      setMyNfts((await contract.fetchMyNfts())?.map(id => id.toString()))
-    } catch (e) {
-      setMyNfts([])
-    }
-  }, [contract]);
+  const { account,contract } = useWalletContext()
+  const { totalMinted } = useTotalMinted()
   
   useEffect(() => {
-    getMyNfts();
-  }, [getMyNfts, count, account]);
+    const getMyNfts = async () => {
+      try {
+        setMyNfts((await contract.fetchMyNfts())?.map(id => id.toString()))
+      } catch (e) {
+        setMyNfts([])
+      }
+    }
 
-  return { getMyNfts, myNfts }
+    getMyNfts()
+  }, [totalMinted, account, contract]);
+
+  return { myNfts }
 };
 
 export default useFetchMyNfts;

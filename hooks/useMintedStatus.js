@@ -1,23 +1,26 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
+import { useWalletContext } from '../context/wallet';
+import useTotalMinted from './useTotalMinted'
 
-const useMintedStatus = (contract, metadataUri, count, account) => {
+const useMintedStatus = (metadataUri) => {
     const [isMinted, setisMinted] = useState(false);
 
-  const getMintedStatus = useCallback(async () => {
-    let result
-    try {
-      result = await contract.isContentOwned(metadataUri);
-      setisMinted(result)
-    } catch (e) {
-      setisMinted(false)
-    }
-  }, [contract, metadataUri]);
+    const { totalMinted } = useTotalMinted()
+    const { account, contract } = useWalletContext()
 
   useEffect(() => {
-    if (contract && metadataUri) {
-      getMintedStatus();
+    const getMintedStatus = async () => {
+      let result
+      try {
+        result = await contract.isContentOwned(metadataUri);
+        setisMinted(result)
+      } catch (e) {
+        setisMinted(false)
+      }
     }
-  }, [contract, count, getMintedStatus, metadataUri, account]);
+
+    getMintedStatus();
+  }, [contract, totalMinted, metadataUri, account]);
 
   return { isMinted }
 }

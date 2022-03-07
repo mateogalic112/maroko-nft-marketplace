@@ -1,8 +1,10 @@
 import { Text, Button, Flex, VStack } from "@chakra-ui/react";
-import useContract from "../hooks/useContract";
+import useCollectContract from "../hooks/useCollectContract";
+import useContractBalance from "../hooks/useContractBalance";
 
 export const Admin = () => {
-  const { contractBalance, getContractBalance, collectMoney } = useContract()
+  const { contractBalance, getContractBalance } = useContractBalance()
+  const { collectMoney } = useCollectContract()
 
   return (
     <Flex gap={4} alignItems="flex-end" justifyContent="flex-start" bg={"rgb(21, 38, 63, 0.5)"}>
