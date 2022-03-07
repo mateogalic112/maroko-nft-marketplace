@@ -1,13 +1,14 @@
 import { useEffect, useState, useCallback } from "react";
+import { useWalletContext } from "../context/wallet";
 
 import useContract from "./useContract";
-import useCount from "./useCount";
 
-const useFetchMyNfts = () => {
+const useFetchMyNfts = (count) => {
   const { contract } = useContract()
 
   const [myNfts, setMyNfts] = useState([])
-  const {totalMinted } = useCount()
+
+  const { account } = useWalletContext()
 
   const getMyNfts = useCallback(async () => {
     try {
@@ -19,7 +20,7 @@ const useFetchMyNfts = () => {
   
   useEffect(() => {
     getMyNfts();
-  }, [totalMinted, getMyNfts]);
+  }, [getMyNfts, count, account]);
 
   return { getMyNfts, myNfts }
 };

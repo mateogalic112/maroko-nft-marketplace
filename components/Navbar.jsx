@@ -2,9 +2,16 @@ import { Box, Flex, Button, Image, Container, Text } from "@chakra-ui/react";
 import { RepeatIcon, UnlockIcon } from "@chakra-ui/icons";
 import { Icon } from '@chakra-ui/react'
 import { useWalletContext } from "../context/wallet";
+import { useEffect } from "react";
 
 export default function Navbar() {
   const {account, connectAccount} = useWalletContext()
+
+  useEffect(() => {
+    if (window.ethereum) {
+      connectAccount()
+    }
+  }, [connectAccount])
 
   return (
     <Box bg={"rgb(21, 38, 63, 0.25)"} sx={{ position: "fixed", zIndex: 200 }} w="100%">

@@ -31,13 +31,17 @@ function WalletProvider({ children }) {
 
   const handleAccountChange = useCallback((accounts) => {
       const payload = accounts.length > 0 ? accounts[0] : null;
-      console.log(payload);
 
       dispatch({
         type: "ACCOUNT_CHANGE",
         payload,
       });
   }, []);
+
+  const getAccountBalance = useCallback(async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    return await provider.getBalance(account)
+  }, [account]) 
 
   const mintToken = async (contract, signer, metadataUri, metadata, getCount) => {
       if (!contract || !signer || !metadataUri) return;
@@ -66,9 +70,10 @@ function WalletProvider({ children }) {
       dispatch,
       connectAccount,
       handleAccountChange,
-      mintToken
+      mintToken,
+      getAccountBalance
     }),
-    [account, handleAccountChange]
+    [account, handleAccountChange, getAccountBalance]
   );
   return (
     <WalletContext.Provider value={value}>{children}</WalletContext.Provider>

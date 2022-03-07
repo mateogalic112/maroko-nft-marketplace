@@ -15,6 +15,7 @@ import {
 import useMintedStatus from "../hooks/useMintedStatus";
 import useMetadata from "../hooks/useMetadata";
 import { useWalletContext } from "../context/wallet";
+import useFetchMyNfts from "../hooks/useFetchMyNfts";
 
 function NftCard({ tokenId, getCount, contract, signer, count }) {
   const metadataUri = `${IPFS_GATEWAY}/${IPFS_JSON_CID}/${tokenId}.json`;
@@ -22,6 +23,12 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
   const { metadata } = useMetadata(metadataUri)
   const { mintToken, account } = useWalletContext()
   const { isMinted } = useMintedStatus(contract, metadataUri, count, account)
+  const { getMyNfts } = useFetchMyNfts(count)
+
+  const mintNft = async () => {
+    await mintToken(contract, signer, metadataUri, metadata, getCount)
+    getMyNfts()
+  }
 
   const textColor = "#8BACD9";
 
@@ -102,7 +109,7 @@ function NftCard({ tokenId, getCount, contract, signer, count }) {
           background="#8247E5"
           w="100%"
           variant="solid"
-          onClick={() => mintToken(contract, signer, metadataUri, metadata, getCount)}
+          onClick={mintNft}
           color="white"
           transition="background 0.2s"
         >

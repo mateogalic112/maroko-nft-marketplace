@@ -22,7 +22,6 @@ describe("NFT minting", function () {
     expect(balance).to.equal(1);
 
     let myNftList = await nft.connect(buyerAddress.address).fetchMyNfts()
-    console.log(myNftList);
     expect(myNftList.length).to.equal(1);
 
     const mintedToken2 = await nft.connect(secondBuyerAddress).payToMint(metadataURI2, nftPrice, {value: ethers.utils.parseEther('100')})
@@ -32,7 +31,6 @@ describe("NFT minting", function () {
     expect(balance).to.equal(1);
 
     myNftList = await nft.connect(buyerAddress.address).fetchMyNfts()
-    console.log(myNftList);
     expect(myNftList.length).to.equal(1);
 
     expect(await nft.isContentOwned(metadataURI)).to.equal(true)
