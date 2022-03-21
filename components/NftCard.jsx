@@ -7,7 +7,8 @@ import {
   Image,
   Heading,
   Spacer,
-  useDisclosure
+  useDisclosure,
+  Center
 } from "@chakra-ui/react";
 import {
   IPFS_JSON_CID,
@@ -28,15 +29,48 @@ function NftCard({ tokenId, getMyNfts }) {
   const { onOpen, isOpen, onClose } = useDisclosure()
 
   const mintNft = async () => {
-    await mintToken(contract, metadataUri, metadata)
-    await getMintedStatus()
-    await getMyNfts()
-    onOpen()
+    try {
+      await mintToken(contract, metadataUri, metadata)
+      await getMintedStatus()
+      await getMyNfts()
+      onOpen()
+    } catch (err) {}
   }
   
   const textColor = "#8BACD9";
 
-  if (!metadata) return <h1>Loading...</h1>;
+  if (!metadata) return (
+    <Box
+        display="flex"
+        maxW={280}
+        h="100%"
+        bg="#15263F"
+        color="white"
+        borderRadius="2xl"
+        p={6}
+        flexDirection="column"
+        boxShadow='0 0 2px #7FB083'
+        transition='box-shadow 0.2s'
+        _hover={{
+          boxShadow: '0 0 5px #7FB083'
+        }}
+      >
+        <Center h='100%'>
+        <Heading
+          as="h5"
+          fontSize="16px"
+          mb={4}
+          cursor="pointer"
+          _hover={{
+            color: "#00FFF8",
+          }}
+          textAlign='center'
+        >
+          IPFS loading... Try refresh
+        </Heading>
+        </Center>
+      </Box>
+  );
 
   return (
     <>

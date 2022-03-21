@@ -6,8 +6,10 @@ const useMetadata = (metadataUri) => {
 
   useEffect(() => {
     const getMetadata = async () => {
-      const response = await axios.get(metadataUri).then((res) => res.data);
-      setMetadata(response);
+      try {
+        const response = await axios.get(metadataUri).then((res) => res.data);
+        setMetadata(response);
+      } catch (err) {}
     };
 
     getMetadata();
