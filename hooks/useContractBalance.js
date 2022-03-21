@@ -1,12 +1,10 @@
 import { useState, useCallback, useEffect } from "react";
 import { useWalletContext } from "../context/wallet";
-import useTotalMinted from "./useTotalMinted";
 
 const useContractBalance = () => {
   const [contractBalance, setContractBalance] = useState(0);
 
   const { contract } = useWalletContext()
-  const { totalMinted } = useTotalMinted()
 
   const getContractBalance = useCallback(async () => {
     try {
@@ -16,7 +14,7 @@ const useContractBalance = () => {
 
   useEffect(() => {
     getContractBalance()
-  }, [getContractBalance, totalMinted, contract])
+  }, [getContractBalance, contract])
 
   return { contractBalance, getContractBalance }
 }

@@ -18,7 +18,7 @@ export default function Home() {
       <Navbar />
 
       <div style={{ height: "4rem" }} />
-      <Admin />
+      {/* <Admin /> */}
 
       <Container maxW="container.lg">
         <Hero />
