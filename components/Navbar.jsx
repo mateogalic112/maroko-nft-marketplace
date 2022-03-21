@@ -17,8 +17,9 @@ export default function Navbar() {
               variant={"solid"}
               size={"sm"}
               leftIcon={<RepeatIcon />}
-              bgColor={"cyan.300"}
-              _hover={{ bg: "cyan.500" }}
+              bgColor={"black"}
+              _hover={{ bg: "black.500" }}
+              color={"white"}
             >
               Connect wallet
             </Button>
