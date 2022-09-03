@@ -8,7 +8,7 @@ import {
 } from "react";
 import walletReducer from "./reducer";
 import { ethers } from "ethers";
-import NFT from "../../artifacts/contracts/NFT.sol/NFT.json";
+import { abi } from "../../contracts/abi/NFT";
 import { CONTRACT_ADDRESS } from "../../utils/constants";
 
 const WalletContext = createContext();
@@ -30,7 +30,7 @@ function WalletProvider({ children }) {
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, NFT.abi, signer);
+    const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, signer);
 
     dispatch({
       type: "ADD_ACCOUNT",
