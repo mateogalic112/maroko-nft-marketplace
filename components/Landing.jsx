@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import useFetchMyNfts from "../hooks/useFetchMyNfts";
 import NftCard from "./NftCard";
 
-const totalNfts = ["1", "2", "3"];
+const totalNfts = [0, 1, 2];
 
 function Landing() {
   const [filterMyNtfs, setFilterByNfts] = useState(false);
@@ -29,7 +29,10 @@ function Landing() {
       <Grid templateColumns="repeat(12, 1fr)" gap={4}>
         {myNftFilter.map((n, idx) => (
           <GridItem key={idx} colSpan={[12, 6, 4, 3]}>
-            <NftCard tokenId={n + 1} getMyNfts={getMyNfts} />
+            <NftCard
+              tokenId={parseInt(n + 1).toString()}
+              getMyNfts={getMyNfts}
+            />
           </GridItem>
         ))}
       </Grid>
