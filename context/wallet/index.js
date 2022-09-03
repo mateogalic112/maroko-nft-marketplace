@@ -4,7 +4,7 @@ import {
   useContext,
   useMemo,
   useCallback,
-  useEffect
+  useEffect,
 } from "react";
 import walletReducer from "./reducer";
 import { ethers } from "ethers";
@@ -18,13 +18,16 @@ const initalState = {
 };
 
 function WalletProvider({ children }) {
-  const [{ account, signer, contract }, dispatch] = useReducer(walletReducer, initalState);
-  
+  const [{ account, signer, contract }, dispatch] = useReducer(
+    walletReducer,
+    initalState
+  );
+
   const connectAccount = useCallback(async () => {
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
-    
+
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const signer = provider.getSigner();
     const contract = new ethers.Contract(CONTRACT_ADDRESS, NFT.abi, signer);
@@ -34,44 +37,48 @@ function WalletProvider({ children }) {
       payload: {
         account: accounts[0],
         signer,
-        contract
+        contract,
       },
     });
   }, []);
 
   useEffect(() => {
     if (window?.ethereum) {
-      connectAccount()
+      connectAccount();
     }
-  }, [connectAccount])
+  }, [connectAccount]);
 
   const handleAccountChange = useCallback((accounts) => {
-      const account = accounts.length > 0 ? accounts[0] : null;
+    const account = accounts.length > 0 ? accounts[0] : null;
 
-      let signer = null
-      if (account) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        signer = provider.getSigner();
-      }
+    let signer = null;
+    if (account) {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+    }
 
-      dispatch({
-        type: "ACCOUNT_CHANGE",
-        payload: {
-          account,
-          signer
-        },
-      });
+    dispatch({
+      type: "ACCOUNT_CHANGE",
+      payload: {
+        account,
+        signer,
+      },
+    });
   }, []);
 
   const mintToken = async (contract, metadataUri, metadata) => {
-      if (!contract || !metadataUri) return;
-      const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
+    if (!contract || !metadataUri) return;
+    const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
+    try {
       const result = await contract.payToMint(metadataUri, formattedPrice, {
         value: formattedPrice,
       });
-  
+
       await result.wait();
-  }
+    } catch (err) {
+      console.log({ err });
+    }
+  };
 
   useEffect(() => {
     window.ethereum.on("chainChanged", () => {
@@ -91,7 +98,7 @@ function WalletProvider({ children }) {
       dispatch,
       connectAccount,
       handleAccountChange,
-      mintToken
+      mintToken,
     }),
     [account, signer, contract, handleAccountChange, connectAccount]
   );

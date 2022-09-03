@@ -2,9 +2,8 @@ import { Box, Button, Grid, GridItem } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
 import useFetchMyNfts from "../hooks/useFetchMyNfts";
 import NftCard from "./NftCard";
-import { NFT_TOTAL } from "../utils/constants";
 
-const totalNfts = [...Array(NFT_TOTAL).keys()];
+const totalNfts = [...Array(3).keys()];
 
 function Landing() {
   const [filterMyNtfs, setFilterByNfts] = useState(false);
@@ -30,7 +29,7 @@ function Landing() {
       <Grid templateColumns="repeat(12, 1fr)" gap={4}>
         {myNftFilter.map((n, idx) => (
           <GridItem key={idx} colSpan={[12, 6, 4, 3]}>
-            <NftCard tokenId={n} getMyNfts={getMyNfts} />
+            <NftCard tokenId={n + 1} getMyNfts={getMyNfts} />
           </GridItem>
         ))}
       </Grid>
