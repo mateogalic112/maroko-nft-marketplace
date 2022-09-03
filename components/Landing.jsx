@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import useFetchMyNfts from "../hooks/useFetchMyNfts";
 import NftCard from "./NftCard";
 
-const totalNfts = [...Array(3).keys()];
+const totalNfts = ["1", "2", "3"];
 
 function Landing() {
   const [filterMyNtfs, setFilterByNfts] = useState(false);
