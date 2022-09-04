@@ -15,6 +15,8 @@ const WalletContext = createContext();
 
 const initalState = {
   account: null,
+  signer: null,
+  contract: null,
 };
 
 function WalletProvider({ children }) {
@@ -24,6 +26,8 @@ function WalletProvider({ children }) {
   );
 
   const connectAccount = useCallback(async () => {
+    if (!window?.ethereum) return;
+
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
@@ -55,23 +59,22 @@ function WalletProvider({ children }) {
   const handleAccountChange = useCallback((accounts) => {
     const account = accounts.length > 0 ? accounts[0] : null;
 
-    let signer = null;
+    let newSigner = null;
     if (account) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      signer = provider.getSigner();
+      newSigner = provider.getSigner();
     }
 
     dispatch({
       type: "ACCOUNT_CHANGE",
       payload: {
         account,
-        signer,
+        signer: newSigner,
       },
     });
   }, []);
 
   const mintToken = async (contract, metadataUri, metadata) => {
-    if (!contract || !metadataUri) return;
     const formattedPrice = ethers.utils.parseEther(metadata.price.toString());
     try {
       const result = await contract.payToMint(metadataUri, formattedPrice, {
@@ -85,13 +88,15 @@ function WalletProvider({ children }) {
   };
 
   useEffect(() => {
-    window.ethereum.on("chainChanged", () => {
-      window.location.reload();
-    });
+    if (window?.ethereum) {
+      window.ethereum.on("chainChanged", () => {
+        window.location.reload();
+      });
 
-    ethereum.on("accountsChanged", (accounts) => {
-      handleAccountChange(accounts);
-    });
+      window.ethereum.on("accountsChanged", (accounts) => {
+        handleAccountChange(accounts);
+      });
+    }
   }, [handleAccountChange]);
 
   const value = useMemo(

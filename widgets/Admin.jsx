@@ -3,11 +3,16 @@ import useCollectContract from "../hooks/useCollectContract";
 import useContractBalance from "../hooks/useContractBalance";
 
 export const Admin = () => {
-  const { contractBalance, getContractBalance } = useContractBalance()
-  const { collectMoney } = useCollectContract()
+  const { contractBalance, getContractBalance } = useContractBalance();
+  const { collectMoney } = useCollectContract();
 
   return (
-    <Flex gap={4} alignItems="flex-end" justifyContent="flex-start" bg={"rgb(21, 38, 63, 0.5)"}>
+    <Flex
+      gap={4}
+      alignItems="flex-end"
+      justifyContent="flex-start"
+      bg={"rgb(21, 38, 63, 0.5)"}
+    >
       <VStack>
         <Text color="cyan.300" fontSize={28}>
           {contractBalance.toString()}

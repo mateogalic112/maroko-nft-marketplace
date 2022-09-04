@@ -4,19 +4,20 @@ import { useWalletContext } from "../context/wallet";
 const useContractBalance = () => {
   const [contractBalance, setContractBalance] = useState(0);
 
-  const { contract } = useWalletContext()
+  const { contract } = useWalletContext();
 
   const getContractBalance = useCallback(async () => {
+    if (!contract) return;
     try {
       setContractBalance(await contract.getBalance());
     } catch (e) {}
   }, [contract]);
 
   useEffect(() => {
-    getContractBalance()
-  }, [getContractBalance, contract])
+    getContractBalance();
+  }, [getContractBalance, contract]);
 
-  return { contractBalance, getContractBalance }
-}
+  return { contractBalance, getContractBalance };
+};
 
-export default useContractBalance
+export default useContractBalance;
